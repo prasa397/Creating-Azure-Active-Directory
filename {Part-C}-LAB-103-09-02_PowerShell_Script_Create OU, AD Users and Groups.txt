@@ -1,0 +1,24 @@
+#Create Organisational Unit
+New-ADOrganizationalUnit -Name "Lab103-AD-OU"
+
+#Create Group-1 in Organisational Unit
+New-ADGroup "OnPGroup01" -GroupCategory Security -GroupScope Global -PassThru –Verbose -Path "Ou=Lab103-AD-OU,DC=YOUR-DOMAIN,DC=com"
+
+#Create User-1 in Organisational Unit
+New-ADUser -Name "OnPUser01" -GivenName "OnP" -Surname "User01" -SamAccountName "OnPUser01" -UserPrincipalName "onpuser01@YOUR-DOMAIN.com" -Path "Ou=Lab103-AD-OU,DC=YOUR-DOMAIN,DC=com" -AccountPassword(ConvertTo-SecureString "P@ssword@123" -AsPlainText -force) -Enabled $true
+
+#Add User-1 in Group-1
+Add-AdGroupMember -Identity "OnPGroup01" -Members OnPUser01
+
+#Create Group-2 in Organisational Unit
+New-ADGroup "OnPGroup02" -GroupCategory Security -GroupScope Global -PassThru –Verbose -Path "Ou=Lab103-AD-OU,DC=YOUR-DOMAIN,DC=com"
+
+#Create User-2 in Organisational Unit
+New-ADUser -Name "OnPUser02" -GivenName "OnP" -Surname "User02" -SamAccountName "OnPUser02" -UserPrincipalName "onpuser02@YOUR-DOMAIN.com" -Path "Ou=Lab103-AD-OU,DC=YOUR-DOMAIN,DC=com" -AccountPassword(ConvertTo-SecureString "P@ssword@123" -AsPlainText -force) -Enabled $true
+
+#Add User-2 in Group-2
+Add-AdGroupMember -Identity "OnPGroup02" -Members OnPUser02
+
+
+#End
+

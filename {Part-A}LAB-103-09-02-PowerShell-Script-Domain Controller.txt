@@ -1,0 +1,41 @@
+<#	
+	Version:        1.0
+	Author:         Ahmad Majeed Zahoory
+	Creation Date:  25th October, 2019
+	Purpose/Change: Deploy Windows 2016 Domain Controller
+#>
+
+# Variables for common values
+$resourceGroup = "RG-103-09-02"
+$location = "eastus"
+
+# Definer user name and password
+$cred = Get-Credential -Message "Enter a username and password for the virtual machine."
+
+# Create a resource group
+New-AzResourceGroup -Name $resourceGroup -Location $location
+
+# Create a virtual network with subnet
+$subnet = New-AzVirtualNetworkSubnetConfig -Name 'OnPSubnet' -AddressPrefix '192.168.0.0/24'
+$vnet = New-AzVirtualNetwork -ResourceGroupName $resourceGroup -Name 'OnP-VNeT' -AddressPrefix '192.168.0.0/24' `
+  -Location $location -Subnet $subnet
+
+
+############################################ Windows 2016 Domain Controller ######################################################
+
+# Create a public IP address and specify a DNS name
+$pip1 = New-AzPublicIpAddress -ResourceGroupName $resourceGroup -Location $location -Name "publicdns$(Get-Random)" -AllocationMethod Dynamic -IdleTimeoutInMinutes 4
+
+# Create a nic for the Windows 2016 Domain Controller
+$nicdc = New-AzNetworkInterface -Name 'nicdc' -ResourceGroupName $resourceGroup -Location $location -SubnetId $vnet.Subnets[0].Id -PublicIpAddressId $pip1.Id
+
+# Create a Windows 2016 Domain Controller configuration
+$vmConfig1 = New-AzVMConfig -VMName OnP-DC01 -VMSize Standard_B2ms | `
+Set-AzVMOperatingSystem -Windows -ComputerName OnP-DC01 -Credential $cred | `
+Set-AzVMSourceImage -PublisherName MicrosoftWindowsServer -Offer WindowsServer -Skus 2016-Datacenter -Version latest | `
+Add-AzVMNetworkInterface -Id $nicdc.Id
+
+# Create a Windows 2016 Domain Controller
+New-AzVM -ResourceGroupName $resourceGroup -Location $location -VM $vmConfig1
+
+#End

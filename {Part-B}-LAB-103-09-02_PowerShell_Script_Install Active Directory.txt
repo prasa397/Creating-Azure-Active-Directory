@@ -1,0 +1,10 @@
+#Install Active Directory Domain Service
+Install-windowsfeature AD-domain-services -includemanagementtools
+
+#Import ADDSDeployment Module
+Import-Module ADDSDeployment
+
+#Configure First Domain Controller in Forest
+Install-ADDSForest -CreateDnsDelegation:$false -DatabasePath "C:\Windows\NTDS" -DomainMode "7" -DomainName "YOUR-DOMAIN.com" -DomainNetbiosName "YOUR-DOMAIN" -ForestMode "7" -InstallDns:$true -LogPath "C:\Windows\NTDS" -NoRebootOnCompletion:$false -SysvolPath "C:\Windows\SYSVOL" -Force:$true
+
+#End
